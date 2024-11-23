@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>IP Address Display</title>
+<style>
+body {
+  font-family: sans-serif;
+}
+#ip-info {
+  margin-top: 20px;
+}
+.status-dot {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 5px;
+}
+.green {
+  background-color: green;
+}
+.red {
+  background-color: red;
+}
+table {
+  width: 50%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+th {
+  background-color: #f2f2f2;
+}
+</style>
+</head>
+<body>
+<h1>Active Connections</h1>
+<table id="connections-table">
+  <thead>
+    <tr>
+      <th>IP Address</th>
+      <th>Port</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<script>
+function updateConnections() {
+  fetch('/get_connections')
+    .then(response => response.json())
+    .then(connections => {
+      const tableBody = document.querySelector('#connections-table tbody');
+      tableBody.innerHTML = ''; // Clear existing rows
+
+      connections.forEach(connection => {
+        const row = tableBody.insertRow();
+        const ipCell = row.insertCell();
+        const portCell = row.insertCell();
+        const statusCell = row.insertCell();
+
+        ipCell.textContent = connection.ip;
+        portCell.textContent = connection.port;
+
+        if (connection.status === 'Online') {
+          statusCell.innerHTML = '<span class="status-dot green"></span> Online';
+        } else {
+          statusCell.innerHTML = '<span class="status-dot red"></span> Offline';
+        }
+      });
+    })
+    .catch(error => {
+      console.error("Error fetching connections:", error);
+    });
+}
+
+// Update connections every 3 seconds
+setInterval(updateConnections, 3000);
+</script>
+</body>
+</html>
